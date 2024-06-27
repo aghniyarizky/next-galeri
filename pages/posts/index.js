@@ -1,33 +1,31 @@
 //layout
-import Layout from "../components/layouts/layout";
+import Layout from "../../components/layouts/layout";
 
 //import Link
 import Link from 'next/link';
 
 import Head from 'next/head';
 
-// //import axios
-// import axios from "axios";
+//import axios
+import axios from "axios";
 
-// //data sementara
-//  const mockPosts = [];
-//  import { posts } from './posts/mockdata/searchdata';
-
+//data sementara
+const mockPosts = [];
 
 //fetch with "getServerSideProps"
-// export async function getServerSideProps() {
+export async function getServerSideProps() {
 
-//     return {
-//       props: {
-//           posts: posts // <-- assign response
-//       },
-//     }
-//   }
+    return {
+      props: {
+          posts: mockPosts // <-- assign response
+      },
+    }
+  }
 
-function PostIndex() {
+function PostIndex(props) {
 
-    // //destruct
-    // const { posts } = props;
+    //destruct
+    const { posts } = props;
 
     return(
 <Layout>
@@ -37,7 +35,7 @@ function PostIndex() {
             <div className="container" style={{ marginTop: '100px' }}>
                 <div className="row justify-content-center">
                     <div className="col-md-6 mt-2">
-                      <div className="p-5 mb-4 bg-light rounded-pill shadow-sm border-0">
+                      <div className="p-5 mb-4 bg-light rounded-3 shadow-sm border-0">
                           <div className="container-fluid py-5">
                               <h2 className="display-6 fw-bold text-center">Looking for new</h2>
                               <h2 className="display-6 fw-bold text-center aqua">ideas?</h2>
