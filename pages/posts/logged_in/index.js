@@ -1,164 +1,102 @@
-//layout
 import Layout from "../../../components/layouts/layout";
-
-import Image from 'next/image';
-
-//import Head
 import Head from 'next/head';
-
+import axios from "axios";
 import { useRouter } from 'next/router';
-
+import Cookies from 'js-cookie';
 import { useState } from 'react';
 
-import React from 'react';
-import { useSearch } from '../../../components/contexts/searchContext';
-
-import { posts } from '../mockdata/searchdata';
-
-import Gallery from '../../../components/gallery/gallery';
-
-const Home = () => {
-    const { searchResults } = useSearch();
-    
+function Home({ posts }) {
+    let token = Cookies.get('accessToken');
+    const [images_shown, setImages_Shown] = useState("");
+  
     const router = useRouter();
-    const handleClick = () => {
-      router.push('/posts/detail');
+  
+    const refreshData = async () => {
+      try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BACKEND}/images`);
+        const updatedPosts = response.data.data;
+        setImages_Shown(""); // Reset nilai images_shown setelah berhasil mengirim data
+        // Update state posts dengan data yang baru
+        // posts seharusnya sudah didefinisikan sebagai state atau prop
+        // Anda dapat mengupdate posts sesuai dengan data baru yang didapat dari server
+        // Contoh: setPosts(updatedPosts);
+      } catch (error) {
+        console.error('Error fetching updated data:', error);
+        // Tangani kesalahan pengambilan data terbaru, jika diperlukan
+      }
     };
-
-
+  
+    const storePost = async (e) => {
+        e.preventDefault();
+      
+        const formData = new FormData();
+        formData.append('token', token);
+        formData.append('images_shown', images_shown);
+      
+        try {
+          const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BACKEND}/api/v1/gallery`, formData);
+          console.log('Successfully sent data:', response.data);
+      
+          // Lakukan sesuatu setelah berhasil mengirim data, misalnya:
+          // - Memperbarui data yang ditampilkan di halaman
+          // - Memanggil refreshData() untuk memperbarui data dari server
+          // - Menampilkan pesan sukses ke pengguna
+      
+          // Misalnya, jika Anda ingin memperbarui data yang ditampilkan, Anda bisa mengambil data terbaru dari server:
+          refreshData();
+      
+        } catch (error) {
+          console.error('Error sending data:', error.response.data);
+          // Tangani kesalahan pengiriman data, misalnya menampilkan pesan error ke pengguna
+        }
+      };
+      
+  
     return (
-        <Layout>
-            <Head>
-                <title>Home</title>
-            </Head>
-                
-            <div className="container_cst"  style={{ marginTop: '80px' }}>
-                        <div className="container_cst"> 
-                            <Gallery posts={posts} />
-                        </div>
-
-                    {/* <h1>Search Results</h1> */}
-                    {searchResults.map(post => {
-                        let imageSizeClass = ''; // Variabel imageSizeClass didefinisikan di sini
-
-                        function getImageSizeClass(width, height) {
-                            if (post.image) { // Memeriksa apakah post.image ada
-                                if (post.image.height >= 300) {
-                                    imageSizeClass = 'card_large';
-                                } else if (post.image.height >= 200) {
-                                    imageSizeClass = 'card_medium';
-                                } else {
-                                    imageSizeClass = 'card_small';
-                                }
-                            } else {
-                                // Handle case when post.image doesn't exist, if needed
-                            }
-                        }
-
-                        return (
-                            <div className={`card ${getImageSizeClass(post.width, post.height)}`}>                        
-                                <Image 
-                                    key={post.id}
-                                    src={post.image} // Pastikan Anda mengakses properti yang sesuai dari post.image
-                                    width={post.width}
-                                    height={post.height}
-                                    alt={post.title} 
-                                    onClick={handleClick}
-                                    // Menggunakan className yang sudah ditentukan
-                                />
-                            </div>
-                        );
-                    })}
-
-                        
-                        
-                <div className="card card_small">
-                    <Image src="https://i.pinimg.com/236x/2f/ff/fa/2ffffa05fc292749bdd5a51be8de22c0.jpg" onClick={handleClick} width="100" height="100" alt=""/>
-                </div> 
-
-                <div className="card card_large">
-                    <Image src="https://i.pinimg.com/236x/3f/b6/6b/3fb66ba5e03b3b0ae93b5e09df5b972a.jpg"  width="100" height="100" alt=""/>
-                </div>
-                <div className="card card_small">
-                    <Image src="https://i.pinimg.com/236x/69/97/11/69971190edaeb579eddc01b1e533028c.jpg"  width="100" height="100" alt=""/>
-                </div>
-                
-                <div className="card card_midium">
-                    <Image src="https://i.pinimg.com/236x/6e/54/35/6e543528b981b2754f24ec6351a73447.jpg"  width="100" height="100"alt=""/>
-                </div>
-                <div className="card card_small">
-                    <Image src="https://i.pinimg.com/236x/6a/8d/15/6a8d1557432b61937e5ec5ad795423f8.jpg"  width="100" height="100"alt=""/>
-                </div>
-                <div className="card card_midium">
-                    <Image src="https://i.pinimg.com/236x/76/c8/81/76c8813ccc1779113a8db8d01b58a7f5.jpg"  width="100" height="100"alt=""/>
-                </div>
-                <div className="card card_large">
-                    <Image src="https://i.pinimg.com/236x/36/19/ba/3619ba2383cc71a1ff8badd881d8375b.jpg"  width="100" height="100" alt=""/>
-                </div>
-
-                <div className="card card_small">
-                    <Image src="https://i.pinimg.com/236x/11/fb/24/11fb24ae9a49b0410d6b7d914db95921.jpg" width="100" height="100" alt=""/>
-                </div>
-                <div className="card card_midium">
-                    <Image src="https://i.pinimg.com/236x/06/8c/df/068cdf34cfc34b6ad1712bd5df0fba4a.jpg" width="100" height="100" alt=""/>
-                </div>
-
-                <div className="card card_small">
-                    <Image src="https://i.pinimg.com/236x/2f/ff/fa/2ffffa05fc292749bdd5a51be8de22c0.jpg" width="100" height="100" alt=""/>
-                </div>
-                <div className="card card_midium">
-                    <Image src="https://i.pinimg.com/236x/76/c8/81/76c8813ccc1779113a8db8d01b58a7f5.jpg" width="100" height="100" alt=""/>
-                </div>
-                <div className="card card_small">
-                    <Image src="https://i.pinimg.com/236x/2f/ff/fa/2ffffa05fc292749bdd5a51be8de22c0.jpg" width="100" height="100" alt=""/>
-                </div>
-                <div className="card card_midium">
-                    <Image src="https://i.pinimg.com/236x/76/c8/81/76c8813ccc1779113a8db8d01b58a7f5.jpg" width="100" height="100" alt=""/>
-                </div>
-                <div className="card card_large">
-                    <Image src="https://i.pinimg.com/236x/3a/f7/a8/3af7a84ae21f9dc9dd19e7308a2c2314.jpg" width="100" height="100" alt=""/>
-                </div>
-                <div className="card card_large">
-                    <Image src="https://i.pinimg.com/236x/75/3f/99/753f993312949b5a208c8d55b18092d4.jpg" width="100" height="100" alt=""/>
-                </div>
-
-                <div className="card card_large">
-                    <Image src="https://i.pinimg.com/236x/7f/96/a6/7f96a6dbbe2328cb50f5a1be6acf301d.jpg" width="100" height="100" alt=""/>
-                </div>
-
-                <div className="card card_small">
-                    <Image src="https://i.pinimg.com/236x/64/61/5f/64615fc76f64fb5f63c7c89d7e322b49.jpg" width="100" height="100" alt=""/>
-                </div>
-                <div className="card card_midium">
-                    <Image src="https://i.pinimg.com/236x/58/54/37/585437b83df3027c4d2aaf5364059b4e.jpg" width="100" height="100" alt=""/>
-                </div>
-                <div className="card card_small">
-                    <Image src="https://i.pinimg.com/236x/b8/07/2c/b8072c70d7e50b3eaddcf48da9715c71.jpg" width="100" height="100" alt=""/>
-                </div>
-                <div className="card card_midium">
-                    <Image src="https://i.pinimg.com/236x/76/c8/81/76c8813ccc1779113a8db8d01b58a7f5.jpg" width="100" height="100" alt=""/>
-                </div>
-                <div className="card card_large">
-                    <Image src="https://i.pinimg.com/236x/3a/f7/a8/3af7a84ae21f9dc9dd19e7308a2c2314.jpg" width="100" height="100" alt=""/>
-                </div>
-                <div className="card card_large">
-                    <Image src="https://i.pinimg.com/236x/7f/96/a6/7f96a6dbbe2328cb50f5a1be6acf301d.jpg" width="100" height="100" alt=""/>
-                </div>
-                <div className="card card_small">
-                    <Image src="https://i.pinimg.com/236x/1b/6b/aa/1b6baa519e6f59c9a4df42609e7ca6fb.jpg" width="100" height="100" alt=""/>
-                </div>
-                <div className="card card_midium">
-                    <Image src="https://i.pinimg.com/236x/76/c8/81/76c8813ccc1779113a8db8d01b58a7f5.jpg" width="100" height="100" alt=""/>
-                </div>
-                <div className="card card_small">
-                    <Image src="https://i.pinimg.com/236x/2f/ff/fa/2ffffa05fc292749bdd5a51be8de22c0.jpg" width="100" height="100" alt=""/>
-                </div>
-                </div>
-
-
-        </Layout>
+      <Layout>
+        <Head>
+          <title>Home</title>
+        </Head>
+        
+        <div className="container_cst" style={{ marginTop: '80px' }}>
+          <form onSubmit={storePost}>
+            <div className="mb-3">
+              <label htmlFor="images_shown" className="form-label mb-2">Images Shown</label>
+              <input type="number" className="form-control rounded-pill" id="images_shown" value={images_shown} onChange={(e) => setImages_Shown(e.target.value)} placeholder="Input number of images" required />
+            </div>
+  
+            {posts.map((post) => (
+              <div key={post.id_image} className="text-center mb-3">
+                <img src={`${updatedPosts}/${post.image_path}`} width="150" className="rounded-3" alt={`Image ${post.title}`} />
+              </div>
+            ))}
+  
+            <button type="submit" className="btn btn-primary rounded-pill">Send</button>
+          </form>
+        </div>
+      </Layout>
     );
-};
+  }
+  
+
+export async function getServerSideProps() {
+  try {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BACKEND}/images`);
+    const posts = response.data.data; // Adjust this line to match your API response structure
+
+    return {
+      props: {
+        posts
+      }
+    };
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return {
+      props: {
+        posts: []
+      }
+    };
+  }
+}
 
 export default Home;
-
